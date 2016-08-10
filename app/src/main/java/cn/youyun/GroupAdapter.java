@@ -13,11 +13,11 @@ import java.util.List;
 /**
  * Created by 卫彪 on 2016/8/9.
  */
-public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> implements View.OnClickListener{
+public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHolder> {
 
     private LayoutInflater inflater;
+    private OnItemClickLitener onItemClickLitener;
     private List<String> groupList = new ArrayList<>();
-    private ClickListener mCallback;
 
     public GroupAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -35,10 +35,19 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
     }
 
     @Override
-    public void onBindViewHolder(GroupViewHolder holder, int position) {
+    public void onBindViewHolder(final GroupViewHolder holder, int position) {
         holder.tv.setText(groupList.get(position));
-        holder.itemView.setTag(position);
-        holder.itemView.setOnClickListener(this);
+//        holder.itemView.setBackgroundResource(R.drawable.recycler_bg);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onItemClickLitener != null) {
+                    int position = holder.getLayoutPosition();
+                    onItemClickLitener.onItemClick(holder.itemView, position);
+                }
+            }
+        });
     }
 
     @Override
@@ -46,22 +55,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupViewHol
         return groupList.size();
     }
 
-    @Override
-    public void onClick(View v) {
-        if(v.getTag() != null){
-            int index = (int)v.getTag();
-            if(mCallback != null){
-                mCallback.onClick(index);
-            }
-        }
+    public interface OnItemClickLitener {
+        void onItemClick(View view, int position);
     }
 
-    public interface ClickListener{
-        void onClick(int position);
-    }
-
-    public void setCallback(ClickListener mCallback) {
-        this.mCallback = mCallback;
+    public void setOnItemClickLitener(OnItemClickLitener onItemClickLitener) {
+        this.onItemClickLitener = onItemClickLitener;
     }
 
     class GroupViewHolder extends RecyclerView.ViewHolder {
